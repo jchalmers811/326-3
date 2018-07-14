@@ -7,5 +7,3 @@ __email__ = "jchalmers811@gmail.com"
 __status__ = "Test"
 
 
-print("testing")
-print("testing")
