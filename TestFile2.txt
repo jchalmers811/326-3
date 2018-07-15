@@ -1,16 +1,8 @@
-We (2 excl) are going
-
-I am going
-
-They (2 excl) are reading
-
-You (2 incl) are reading
-
-I went
-
-I will go
-
-gibberish
-
-We are coming
-done
+Kei te haere māua
+Kei te haere au
+Kei te pānui rāua
+Kei te pānui kōrua
+I haere au
+Ka haere au
+invalid sentence
+invalid verb "coming"
