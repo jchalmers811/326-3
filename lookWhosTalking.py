@@ -53,83 +53,95 @@ def getVerbPastOrPresent(word):
         "wanted": "I hiaia",
         "called": "I karanga",
         "asked": "I pātai",
-        "read": "I pānui", # read defaults to passed tense
+        "read": "I pānui", # read defaults to past tense
         "learned": "I ako"
-
     }
     return verbDictionary.get(word, "invalid verb \"" + word + "\"") # default: returns invalid "verb" message
+
+def getYouPronoun:
+
+
+def getTheyPronoun:
+
+
+def getWePronoun:
+
 
 def translate(line):
     line = line.lower() # convert enlgish sentence to lowercase
     englishWords = line.split() # split line into words for processing
-    sentenceLength = len(englishWords) # for checking if sentence is valid
-    sentencePointer = 0
-    maoriWords = [] # create list for maori sentence
+    maoriWords = []  # create list for maori sentence
 
-    if sentenceLength >= 2 and sentenceLength <= 5: # check for invalid sentences immediately
+    if len(englishWords) >= 2 and len(englishWords) <= 5: # check for invalid sentences size
+        currentWord = englishWords.pop(0)
 
-        if englishWords[sentencePointer] == "i":
+        if currentWord == "i":
             maoriWords.append("au")
-            sentencePointer += 1
+            currentWord = englishWords.pop(0)
 
-        elif englishWords[sentencePointer] == "he" or englishWords[sentencePointer] == "she":
+        elif currentWord == "he" or currentWord == "she":
             maoriWords.append("ia")
-            sentencePointer += 1
+            currentWord = englishWords.pop(0)
 
-        elif englishWords[sentencePointer] == "you":
+        elif currentWord == "you":
 
-            sentencePointer += 1
-            if sentenceLength >= 3: # check sentence is long enough for inclusive/exclusive check
-                if englishWords[sentencePointer] == "(3" and englishWords[sentencePointer + 1] == "incl)":
+            currentWord = englishWords.pop(0)
+            if len(englishWords) > 2: # check sentence is long enough for inclusive/exclusive check and verb
+                if currentWord == "(3" and englishWords[0] == "incl)":
                     maoriWords.append("koutou")
-                    sentencePointer += 2
-                elif englishWords[sentencePointer] == "(2" and englishWords[sentencePointer + 1] == "incl)":
+                    englishWords.pop(0)
+                    currentWord = englishWords.pop(0)
+                elif currentWord == "(2" and englishWords[0] == "incl)":
                     maoriWords.append("kōrua")
-                    sentencePointer += 2
-                elif englishWords[sentencePointer] == "(1" and englishWords[sentencePointer + 1] == "incl)":
+                    englishWords.pop(0)
+                    currentWord = englishWords.pop(0)
+                elif currentWord == "(1" and englishWords[0] == "incl)":
                     maoriWords.append("koe")
-                    sentencePointer += 2
+                    englishWords.pop(0)
+                    currentWord = englishWords.pop(0)
             else:
                 maoriWords.append("koe") # default is to assume singular inclusive you
 
-        elif englishWords[sentencePointer] == "they":
+        elif currentWord == "they":
 
-            sentencePointer += 1
-            if sentenceLength >= 3: # check sentence is long enough for inclusive/exclusive check
-                if englishWords[sentencePointer] == "(3" and englishWords[sentencePointer + 1] == "excl)":
+            currentWord = englishWords.pop(0)
+            if len(englishWords) > 2:  # check sentence is long enough for inclusive/exclusive check and verb
+                if currentWord == "(3" and englishWords[0] == "excl)":
                     maoriWords.append("rātou")
-                    sentencePointer += 2
-                elif englishWords[sentencePointer] == "(2" and englishWords[sentencePointer + 1] == "excl)":
+                    englishWords.pop(0)
+                    currentWord = englishWords.pop(0)
+                elif currentWord == "(2" and englishWords[0] == "excl)":
                     maoriWords.append("rāua")
-                    sentencePointer += 2
+                    englishWords.pop(0)
+                    currentWord = englishWords.pop(0)
             else:
                 maoriWords.append("rāua")  # default is to assume two exclusive they
 
-        elif englishWords[sentencePointer] == "we":
+        elif currentWord == "we":
 
-            sentencePointer += 1
-            if sentenceLength >= 3:  # check sentence is long enough for inclusive/exclusive check
-                if englishWords[sentencePointer] == "(3":
+            currentWord = englishWords.pop(0)
+            if len(englishWords) > 2:  # check sentence is long enough for inclusive/exclusive check and verb
+                if currentWord == "(3":
 
-                    sentencePointer += 1
-                    if englishWords[sentencePointer] == "excl)":
+                    currentWord = englishWords.pop(0)
+                    if currentWord == "excl)":
                         maoriWords.append("mātou")
-                        sentencePointer += 1
-                    elif englishWords[sentencePointer] == "incl)":
+                        currentWord = englishWords.pop(0)
+                    elif currentWord == "incl)":
                         maoriWords.append("tātou")
-                        sentencePointer += 1
+                        currentWord = englishWords.pop(0)
                     else:
                         return INVALID
 
-                if englishWords[sentencePointer] == "(2":
+                elif currentWord == "(2":
 
-                    sentencePointer += 1
-                    if englishWords[sentencePointer] == "excl)":
+                    currentWord = englishWords.pop(0)
+                    if currentWord == "excl)":
                         maoriWords.append("māua")
-                        sentencePointer += 1
-                    elif englishWords[sentencePointer] == "incl)":
+                        currentWord = englishWords.pop(0)
+                    elif currentWord == "incl)":
                         maoriWords.append("tāua")
-                        sentencePointer += 1
+                        currentWord = englishWords.pop(0)
                     else:
                         return INVALID
 
@@ -139,33 +151,36 @@ def translate(line):
         else:
             return INVALID
 
-        if sentencePointer + 2 == sentenceLength: # check if list long enough for auxiliary verbs 'will' or 'am' and verb
+        if len(englishWords) == 1: # one left in list means auxiliary verb + verb
 
-            if englishWords[sentencePointer] == "am" or englishWords[sentencePointer] == "are":
-                maoriWords.insert(0, getVerbPresent(englishWords[sentencePointer + 1]))
+            if currentWord == "am" or currentWord == "are":
+                maoriVerb = getVerbPresent(englishWords.pop(0))
 
-                if "invalid verb" in maoriWords[0]:  # if verb was invalid return message and end early
-                    return maoriWords[0]
+                if "invalid verb" in maoriVerb:  # if verb was invalid return message and end early
+                    return maoriVerb
                 else:
+                    maoriWords.insert(0, maoriVerb)
                     return ' '.join(maoriWords)
 
-            elif englishWords[sentencePointer] == "will":
-                maoriWords.insert(0, getVerbFuture(englishWords[sentencePointer + 1]))
+            elif currentWord == "will":
+                maoriVerb = getVerbFuture(englishWords[-1])
 
-                if "invalid verb" in maoriWords[0]:  # if verb was invalid return message and end early
-                    return maoriWords[0]
+                if "invalid verb" in maoriVerb:  # if verb was invalid return message and end early
+                    return maoriVerb
                 else:
+                    maoriWords.insert(0, maoriVerb)
                     return ' '.join(maoriWords)
 
             else:
                 return INVALID
 
-        elif sentencePointer + 1 == sentenceLength: # check if list long enough for verb
-            maoriWords.insert(0, getVerbPastOrPresent(englishWords[sentencePointer]))
+        elif len(englishWords) == 0: # empty list means no auxiliary verb
+            maoriVerb = getVerbPastOrPresent(currentWord)
 
-            if "invalid verb" in maoriWords[0]:  # if verb was invalid return message and end early
-                return maoriWords[0]
+            if "invalid verb" in maoriVerb:  # if verb was invalid return message and end early
+                return maoriVerb
             else:
+                maoriWords.insert(0, maoriVerb)
                 return ' '.join(maoriWords)
 
 
