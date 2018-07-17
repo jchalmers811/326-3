@@ -9,9 +9,84 @@ __status__ = "Test"
 
 import sys
 
+# constants
 INVALID = "invalid sentence" # returned if sentence is deemed invalid at anypoint
 
+
+def getYouPronoun(currentWord, englishWords):
+    """Takes currentWord and englishWord and returns updated
+    versions of both and the appropriate maori pronoun as a tuple"""
+
+    # check sentence is long enough for inclusive/exclusive check
+    if len(englishWords) > 1:
+        if englishWords[0] == "(3" and englishWords[1] == "incl)":
+            del englishWords[0:2]
+            currentWord = englishWords.pop(0)
+            return currentWord, englishWords, "koutou"
+        elif englishWords[0] == "(2" and englishWords[1] == "incl)":
+            del englishWords[0:2]
+            currentWord = englishWords.pop(0)
+            return currentWord, englishWords, "kōrua"
+        elif englishWords[0,1] == "(1" and englishWords[1] == "incl)":
+            del englishWords[0:2]
+            currentWord = englishWords.pop(0)
+            return currentWord, englishWords, "koe"
+
+    currentWord = englishWords.pop(0)
+    return currentWord, englishWords, "koe" #  will default to singular inclusive you
+
+def getTheyPronoun(currentWord, englishWords):
+    """Takes currentWord and englishWord and returns updated
+    versions of both and the appropriate maori pronoun as a tuple"""
+
+    # check sentence is long enough for inclusive/exclusive check
+    if len(englishWords) > 1:
+        if englishWords[0] == "(3" and englishWords[1] == "excl)":
+            del englishWords[0:2]
+            currentWord = englishWords.pop(0)
+            return currentWord, englishWords, "rātou"
+        elif englishWords[0] == "(2" and englishWords[1] == "excl)":
+            del englishWords[0:2]
+            currentWord = englishWords.pop(0)
+            return currentWord, englishWords, "rāua"
+
+    currentWord = englishWords.pop(0)
+    return currentWord, englishWords, "rāua"  # default is to assume two exclusive they
+
+def getWePronoun(currentWord, englishWords):
+    """Takes currentWord and englishWord and returns updated
+    versions of both and the appropriate maori pronoun as a tuple"""
+
+    # check sentence is long enough for inclusive/exclusive check
+    if len(englishWords) > 1:
+
+        if englishWords[0] == "(3":
+            if englishWords[1] == "excl)":
+                del englishWords[0:2]
+                currentWord = englishWords.pop(0)
+                return currentWord, englishWords, "mātou"
+            elif englishWords[1] == "incl)":
+                del englishWords[0:2]
+                currentWord = englishWords.pop(0)
+                return currentWord, englishWords, "tātou"
+
+        elif englishWords[0] == "(2":
+            if englishWords[1] == "excl)":
+                del englishWords[0:2]
+                currentWord = englishWords.pop(0)
+                return currentWord, englishWords, "māua"
+            elif englishWords[0] == "incl)":
+                del englishWords[0:2]
+                currentWord = englishWords.pop(0)
+                return currentWord, englishWords, "tāua"
+
+    currentWord = englishWords.pop(0)
+    return currentWord, englishWords, "māua" # default is to assume two exclusive we
+
 def getVerbFuture(word):
+    """Takes a word and returns the appropriate maori
+    verb or None if it is invalid"""
+
     verbDictionary = {
         "go": "Ka haere",
         "make": "Ka hanga",
@@ -22,9 +97,12 @@ def getVerbFuture(word):
         "read": "Ka pānui",
         "learn": "Ka ako"
     }
-    return verbDictionary.get(word, "invalid verb \"" + word + "\"") # default: returns invalid "verb" message
+    return verbDictionary.get(word, None) # default: returns invalid "verb" message
 
 def getVerbPresent(word):
+    """Takes a word and returns the appropriate maori
+    verb or None if it is invalid"""
+
     verbDictionary = {
         "going": "Kei te haere",
         "making": "Kei te hanga",
@@ -35,9 +113,12 @@ def getVerbPresent(word):
         "reading": "Kei te pānui",
         "learning": "Kei te ako"
     }
-    return verbDictionary.get(word, "invalid verb \"" + word + "\"") # default: returns invalid "verb" message
+    return verbDictionary.get(word, None) # default: returns invalid "verb" message
 
 def getVerbPastOrPresent(word):
+    """Takes a word and returns the appropriate maori
+    verb or None if it is invalid"""
+
     verbDictionary = {
         "go": "Kei te haere",
         "make": "Kei te hanga",
@@ -56,25 +137,20 @@ def getVerbPastOrPresent(word):
         "read": "I pānui", # read defaults to past tense
         "learned": "I ako"
     }
-    return verbDictionary.get(word, "invalid verb \"" + word + "\"") # default: returns invalid "verb" message
+    return verbDictionary.get(word, None) # default: returns invalid "verb" message
 
-def getYouPronoun:
-
-
-def getTheyPronoun:
-
-
-def getWePronoun:
 
 
 def translate(line):
     line = line.lower() # convert enlgish sentence to lowercase
-    englishWords = line.split() # split line into words for processing
-    maoriWords = []  # create list for maori sentence
+    englishWords = line.split() # split line into words for processing, write to global variable
+    maoriWords = []      # create list for maori sentence
 
-    if len(englishWords) >= 2 and len(englishWords) <= 5: # check for invalid sentences size
+    # check for valid sentences size before popping
+    if len(englishWords) >= 2 and len(englishWords) <= 5:
         currentWord = englishWords.pop(0)
 
+        # check for simple pronouns in main function
         if currentWord == "i":
             maoriWords.append("au")
             currentWord = englishWords.pop(0)
@@ -83,90 +159,46 @@ def translate(line):
             maoriWords.append("ia")
             currentWord = englishWords.pop(0)
 
-        elif currentWord == "you":
+        # check for more complex pronouns with methods
 
-            currentWord = englishWords.pop(0)
-            if len(englishWords) > 2: # check sentence is long enough for inclusive/exclusive check and verb
-                if currentWord == "(3" and englishWords[0] == "incl)":
-                    maoriWords.append("koutou")
-                    englishWords.pop(0)
-                    currentWord = englishWords.pop(0)
-                elif currentWord == "(2" and englishWords[0] == "incl)":
-                    maoriWords.append("kōrua")
-                    englishWords.pop(0)
-                    currentWord = englishWords.pop(0)
-                elif currentWord == "(1" and englishWords[0] == "incl)":
-                    maoriWords.append("koe")
-                    englishWords.pop(0)
-                    currentWord = englishWords.pop(0)
-            else:
-                maoriWords.append("koe") # default is to assume singular inclusive you
+        elif currentWord == "you":
+            currentWord, englishWords, maoriPronoun = getYouPronoun(currentWord, englishWords)
+            maoriWords.append(maoriPronoun)
 
         elif currentWord == "they":
-
-            currentWord = englishWords.pop(0)
-            if len(englishWords) > 2:  # check sentence is long enough for inclusive/exclusive check and verb
-                if currentWord == "(3" and englishWords[0] == "excl)":
-                    maoriWords.append("rātou")
-                    englishWords.pop(0)
-                    currentWord = englishWords.pop(0)
-                elif currentWord == "(2" and englishWords[0] == "excl)":
-                    maoriWords.append("rāua")
-                    englishWords.pop(0)
-                    currentWord = englishWords.pop(0)
-            else:
-                maoriWords.append("rāua")  # default is to assume two exclusive they
+            currentWord, englishWords, maoriPronoun = getTheyPronoun(currentWord, englishWords)
+            maoriWords.append(maoriPronoun)
 
         elif currentWord == "we":
-
-            currentWord = englishWords.pop(0)
-            if len(englishWords) > 2:  # check sentence is long enough for inclusive/exclusive check and verb
-                if currentWord == "(3":
-
-                    currentWord = englishWords.pop(0)
-                    if currentWord == "excl)":
-                        maoriWords.append("mātou")
-                        currentWord = englishWords.pop(0)
-                    elif currentWord == "incl)":
-                        maoriWords.append("tātou")
-                        currentWord = englishWords.pop(0)
-                    else:
-                        return INVALID
-
-                elif currentWord == "(2":
-
-                    currentWord = englishWords.pop(0)
-                    if currentWord == "excl)":
-                        maoriWords.append("māua")
-                        currentWord = englishWords.pop(0)
-                    elif currentWord == "incl)":
-                        maoriWords.append("tāua")
-                        currentWord = englishWords.pop(0)
-                    else:
-                        return INVALID
-
-            else:
-                maoriWords.append("māua")  # default is to assume two exclusive we
+            currentWord, englishWords, maoriPronoun = getWePronoun(currentWord, englishWords)
+            maoriWords.append(maoriPronoun)
 
         else:
             return INVALID
 
-        if len(englishWords) == 1: # one left in list means auxiliary verb + verb
 
-            if currentWord == "am" or currentWord == "are":
-                maoriVerb = getVerbPresent(englishWords.pop(0))
+        # infer tense and get verb
+        # one left in list means auxiliary verb + verb
+        if len(englishWords) == 1:
 
-                if "invalid verb" in maoriVerb:  # if verb was invalid return message and end early
-                    return maoriVerb
+            if currentWord == "am" or currentWord == "are" or currentWord == "is":
+                currentWord = englishWords.pop(0)
+                maoriVerb = getVerbPresent(currentWord)
+
+                # if verb was invalid return message and end early
+                if maoriVerb == None:
+                    return "invalid verb \"" + currentWord + "\""
                 else:
                     maoriWords.insert(0, maoriVerb)
                     return ' '.join(maoriWords)
 
             elif currentWord == "will":
-                maoriVerb = getVerbFuture(englishWords[-1])
+                currentWord = englishWords.pop(0)
+                maoriVerb = getVerbFuture(currentWord)
 
-                if "invalid verb" in maoriVerb:  # if verb was invalid return message and end early
-                    return maoriVerb
+                # if verb was invalid return message and end early
+                if maoriVerb == None:
+                    return "invalid verb \"" + currentWord + "\""
                 else:
                     maoriWords.insert(0, maoriVerb)
                     return ' '.join(maoriWords)
@@ -177,8 +209,8 @@ def translate(line):
         elif len(englishWords) == 0: # empty list means no auxiliary verb
             maoriVerb = getVerbPastOrPresent(currentWord)
 
-            if "invalid verb" in maoriVerb:  # if verb was invalid return message and end early
-                return maoriVerb
+            if maoriVerb == None:  # if verb was invalid return message and end early
+                return "invalid verb \"" + currentWord + "\""
             else:
                 maoriWords.insert(0, maoriVerb)
                 return ' '.join(maoriWords)
@@ -194,5 +226,7 @@ def translate(line):
 # read lines from stdin one at a time
 for line in sys.stdin:
      print(translate(line))
+
+
 
 # print(translate("We (2 excl) are going"))
