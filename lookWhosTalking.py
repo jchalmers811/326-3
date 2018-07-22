@@ -142,6 +142,8 @@ def getVerbPastOrPresent(word):
 
 
 def translate(line):
+    """Processes each english sentence and returns INVALID or maori sentence"""
+
     line = line.lower() # convert enlgish sentence to lowercase
     englishWords = line.split() # split line into words for processing, write to global variable
     maoriWords = []      # create list for maori sentence
@@ -206,7 +208,8 @@ def translate(line):
             else:
                 return INVALID
 
-        elif len(englishWords) == 0: # empty list means no auxiliary verb
+        # empty list means no auxiliary verb
+        elif len(englishWords) == 0:
             maoriVerb = getVerbPastOrPresent(currentWord)
 
             if maoriVerb == None:  # if verb was invalid return message and end early
@@ -229,4 +232,3 @@ for line in sys.stdin:
 
 
 
-# print(translate("We (2 excl) are going"))
